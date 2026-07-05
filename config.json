@@ -1,0 +1,10 @@
+{
+  "bot_name": "Ndolo Trader AI",
+  "mode": "demo",
+  "broker": "deriv",
+  "risk_level": "medium",
+  "timeframe": "1m",
+  "assets": ["Volatility 100 Index", "Volatility 75 Index"],
+  "trade_amount": 1,
+  "auto_trade": false
+}
