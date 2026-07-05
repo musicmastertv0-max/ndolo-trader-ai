@@ -1,28 +1,43 @@
-# Deriv Trade Executor (AUTH REQUIRED)
-
 import json
 import websocket
 
 DERIV_APP_ID = 1089
-
-# IMPORTANT: paste your API token here later
-API_TOKEN = pat_8014c88bba9a38ab12fb250a861b1d505464a75a8f9865c75e6da3e6bd570903
+API_TOKEN = "YOUR_TOKEN_HERE"
 
 ws = None
 
 def on_open(ws):
-    print("🔐 Connected to Deriv Trading Server")
+    print("🔐 Connected to Deriv")
 
-    # authorize request
-    auth_request = {
+    # Step 1: authorize
+    ws.send(json.dumps({
         "authorize": API_TOKEN
-    }
-    ws.send(json.dumps(auth_request))
+    }))
 
 
 def on_message(ws, message):
     data = json.loads(message)
-    print("AUTH RESPONSE:", data)
+    print("RESPONSE:", data)
+
+    # After authorization, place a demo trade once
+    if data.get("msg_type") == "authorize":
+        print("✅ Authorized - placing DEMO trade...")
+
+        trade_request = {
+            "buy": 1,
+            "price": 1,
+            "parameters": {
+                "amount": 1,
+                "basis": "stake",
+                "contract_type": "CALL",
+                "currency": "USD",
+                "duration": 1,
+                "duration_unit": "t",
+                "symbol": "R_100"
+            }
+        }
+
+        ws.send(json.dumps(trade_request))
 
 
 def connect():
