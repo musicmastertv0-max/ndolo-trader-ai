@@ -6,7 +6,7 @@ import websocket
 DERIV_APP_ID = 1089
 
 # IMPORTANT: paste your API token here later
-API_TOKEN = "PUT_YOUR_DERIV_TOKEN_HERE"
+API_TOKEN = pat_8014c88bba9a38ab12fb250a861b1d505464a75a8f9865c75e6da3e6bd570903
 
 ws = None
 
