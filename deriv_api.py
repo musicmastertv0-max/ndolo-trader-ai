@@ -1,45 +1,42 @@
-# Deriv API - Live tick provider (fixed)
+# Ndolo Trader AI - Fully Connected Live Bot
 
-import websocket
 import json
+import threading
+from deriv_api import start_deriv_stream, set_price_callback
 
-DERIV_APP_ID = 1089
+latest_price = None
 
-# This will be set by bot.py
-price_callback = None
+# Load config
+with open("config.json", "r") as f:
+    config = json.load(f)
 
-def set_price_callback(callback):
-    global price_callback
-    price_callback = callback
+print("🤖 LIVE BOT STARTED")
+print("Assets:", config["assets"])
 
-def on_message(ws, message):
-    data = json.loads(message)
+def on_price_update(price):
+    global latest_price
+    latest_price = price
 
-    if "tick" in data:
-        price = data["tick"]["quote"]
+def strategy(price):
+    if price is None:
+        return None
 
-        print("Live Price:", price)
+    # simple movement logic
+    if price > 100:
+        return "SELL"
+    else:
+        return "BUY"
 
-        if price_callback:
-            price_callback(price)
+def market_thread():
+    start_deriv_stream()
 
-def on_open(ws):
-    print("Connected to Deriv WebSocket")
+# connect callback
+set_price_callback(on_price_update)
 
-    request = {
-        "ticks": "R_100",
-        "subscribe": 1
-    }
+threading.Thread(target=market_thread, daemon=True).start()
 
-    ws.send(json.dumps(request))
+while True:
+    signal = strategy(latest_price)
 
-def start_deriv_stream():
-    url = f"wss://ws.derivws.com/websockets/v3?app_id={DERIV_APP_ID}"
-
-    ws = websocket.WebSocketApp(
-        url,
-        on_message=on_message,
-        on_open=on_open
-    )
-
-    ws.run_forever()
+    if signal:
+        print("SIGNAL:", signal, "| Price:", latest_price)
